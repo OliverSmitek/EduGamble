@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 
 function Listing({ ID, Name, NameOfDrop, Price, ImageLink, buyCrate }) {
     const handleOpen = () => {

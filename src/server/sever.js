@@ -458,7 +458,7 @@ let legendaryCrate = [
 
 // ---------- INVENTORY & COINS ----------
 let kosike = [];
-let coins = 15;   // starting coins
+let coins = 25;   // starting coins
 
 // ---------- COINS ENDPOINTS ----------
 app.get("/api/coins", (req, res) => {

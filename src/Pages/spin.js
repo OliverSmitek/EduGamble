@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import Spinlcone from "../components/SpinIcone";
 
@@ -241,7 +241,7 @@ function WinModal({ item, onClose }) {
     );
 }
 
-// Hlavní komponenta Spin (zůstává stejná, jen přidáme nové CSS)
+// Hlavní komponenta Spin (opravena chybějící závislost)
 function Spin() {
     const [searchParams] = useSearchParams();
     const dropType = searchParams.get("drop") || "dataRareCrate";
@@ -280,7 +280,8 @@ function Spin() {
         }
     };
 
-    async function getDrops() {
+    // Oprava: použití useCallback, aby getDrops byl stabilní mezi rendery
+    const getDrops = useCallback(async () => {
         const endpoint = getEndpoint(dropType);
         try {
             const res = await fetch(endpoint);
@@ -294,14 +295,15 @@ function Spin() {
             setOriginalDrops([]);
             setDrops([]);
         }
-    }
+    }, [dropType]);
 
+    // Oprava: závislost nyní obsahuje getDrops (stabilní díky useCallback)
     useEffect(() => {
         getDrops();
         return () => {
             if (spinTimeoutRef.current) clearTimeout(spinTimeoutRef.current);
         };
-    }, [dropType]);
+    }, [getDrops]);
 
     function sequentialPick(items) {
         if (!items.length) return null;
@@ -662,6 +664,8 @@ function Spin() {
                 .fertility-confetti::before { left: 5%; animation-delay: 0s; }
                 .fertility-confetti::after { left: 80%; animation-delay: 0.8s; }
                 @keyframes confettiFall { 0% { transform: translateY(-100px) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+                @keyframes starSpin { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
+                @keyframes floatNote { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-60px) rotate(15deg); opacity: 0; } }
             `}</style>
         </div>
     );
